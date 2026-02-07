@@ -2,27 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Titanic Gates | FastAPI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanic Gates | Parallel Inference Archive</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Source Serif 4', serif; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
+
 <body class="bg-[#fafafa] text-[#09090b] antialiased min-h-screen">
 
 <div class="max-w-6xl mx-auto py-12 px-6 space-y-10">
+
     <header class="space-y-2">
         <h1 class="text-4xl font-bold tracking-tight">Titanic Lifeboat Gates</h1>
-        <p class="text-muted-foreground text-slate-500 text-lg">Parallel algorithmic survival prediction.</p>
+        <p class="text-slate-500 text-lg font-medium">Parallel algorithmic survival prediction.</p>
     </header>
 
-    <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div class="p-6">
             <form action="/predict" method="post" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                
                 <div class="space-y-2">
                     <label class="text-sm font-medium leading-none">Passenger Class</label>
-                    <select name="pclass" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                    <select name="pclass" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-950 transition-all">
                         <option value="1" {% if form_data and form_data.pclass == 1 %}selected{% endif %}>First Class</option>
                         <option value="2" {% if form_data and form_data.pclass == 2 %}selected{% endif %}>Second Class</option>
                         <option value="3" {% if not form_data or form_data.pclass == 3 %}selected{% endif %}>Third Class</option>
@@ -31,7 +41,7 @@
                 
                 <div class="space-y-2">
                     <label class="text-sm font-medium leading-none">Gender</label>
-                    <select name="sex_male" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+                    <select name="sex_male" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-950 transition-all">
                         <option value="1" {% if not form_data or form_data.sex_male == 1 %}selected{% endif %}>Male</option>
                         <option value="0" {% if form_data and form_data.sex_male == 0 %}selected{% endif %}>Female</option>
                     </select>
@@ -39,44 +49,94 @@
 
                 <div class="space-y-2">
                     <label class="text-sm font-medium leading-none">Age</label>
-                    <input type="number" name="age" step="0.1" value="{{ form_data.age if form_data else 25 }}" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+                    <input type="number" name="age" step="0.1" value="{{ form_data.age if form_data else 25 }}" class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-950 transition-all">
                 </div>
 
                 <input type="hidden" name="fare" value="32.0">
 
                 <div class="flex items-end">
-                    <button type="submit" class="inline-flex items-center justify-center rounded-md bg-slate-900 px-8 py-2 text-sm font-medium text-white hover:bg-slate-900/90 h-10 w-full transition-colors">
-                        Deploy Models
+                    <button type="submit" class="inline-flex items-center justify-center rounded-md bg-slate-900 px-8 py-2 text-sm font-medium text-white hover:bg-slate-800 h-10 w-full transition-all active:scale-[0.98]">
+                        Predict
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 
     {% if results %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in duration-500">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {% for gate in results %}
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4 animate-in">
             <div class="flex items-center justify-between">
-                <h3 class="font-semibold tracking-tight text-sm text-slate-500 uppercase">{{ gate.name }}</h3>
-                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 {{ 'border-transparent bg-slate-900 text-slate-50' if gate.survived else 'border-slate-200 text-slate-900' }}">
-                    {{ 'Survived' if gate.survived else 'Died' }}
+                <h3 class="font-semibold tracking-tight text-xs text-slate-500 uppercase">{{ gate.name }}</h3>
+                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold {{ 'bg-slate-900 text-slate-50 border-transparent' if gate.survived else 'bg-white text-slate-900 border-slate-200' }}">
+                    {{ 'Survived' if gate.survived else 'Perished' }}
                 </span>
             </div>
             
             <div class="space-y-2">
-                <div class="flex justify-between text-2xl font-bold">
+                <div class="flex justify-between text-2xl font-bold tracking-tighter">
                     <span>{{ gate.prob }}%</span>
                 </div>
                 <div class="relative h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div class="h-full w-full flex-1 bg-slate-900 transition-all duration-700" style="transform: translateX(-{{ 100 - gate.prob }}%)"></div>
+                    <div class="h-full bg-slate-900 transition-all duration-1000 ease-out" style="width: {{ gate.prob }}%"></div>
                 </div>
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest">Survival Probability</p>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Likelihood of Survival</p>
             </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
+
+    <div class="pt-20 mt-20 border-t border-slate-200 space-y-12">
+
+        <div class="max-w-2xl mx-auto text-center space-y-6">
+            <h2 class="text-[10px] font-bold tracking-[0.3em] uppercase text-slate-400">Technical Addendum</h2>
+            <h3 class="text-4xl font-serif italic text-slate-900 leading-tight">
+                A Comparative Analysis of Multi-Model Binary Classification in High-Stakes Disaster Recovery
+            </h3>
+            <div class="flex flex-col items-center space-y-1">
+                <p class="text-sm font-bold text-slate-800">Yonas T. A.</p>
+                <p class="text-xs text-slate-500 italic">Machine Learning Project</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-base leading-relaxed text-slate-700 font-serif max-w-4xl mx-auto">
+
+            <div class="space-y-4">
+                <p>
+                    <span class="text-4xl font-bold text-slate-900 float-left mr-3 mt-1 leading-none">T</span>his project presents a parallel inference framework for survival prediction using the historical Titanic passenger dataset. The system implements a multi-model architecture referred to as Lifeboat Gates, in which multiple machine learning models operate simultaneously on identical input features to generate independent probabilistic survival estimates.
+                </p>
+                <p>
+                    Rather than producing a single authoritative prediction, the system is designed as a comparative analytical structure in which each model functions as an independent inference agent. This architecture enables direct observation of how different mathematical and computational paradigms interpret the same historical data, transforming prediction into a structured analysis of algorithmic reasoning.
+                </p>
+                <p>
+                    The Logistic Gate serves as the statistical baseline model, applying a sigmoid transformation over a linear combination of features to produce interpretable survival probabilities. It provides coefficient-level transparency and represents classical statistical learning through proportional feature influence and linear decision structure.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <p>
+                    The Random Forest and XGBoost gates represent ensemble-based and boosting-based learning systems that model complex non-linear relationships and hierarchical feature interactions. These models capture structured dependencies between class, age, gender, and socioeconomic indicators that are not expressible within linear model assumptions.
+                </p>
+                <p>
+                    The SVM gate introduces margin-based geometric reasoning through decision boundary optimization in high-dimensional feature space, offering a fundamentally different representation of survivability structure that is not probability-driven but separation-driven.
+                </p>
+                <p>
+                    The objective of this project is to construct a transparent multi-model inference system that enables comparative reasoning, interpretability through model disagreement, and structural understanding of inductive bias in machine learning systems. The framework transforms historical disaster data into an experimental platform for studying how different algorithmic systems encode reality, uncertainty, and decision logic.
+                </p>
+            </div>
+
+        </div>
+        
+        <div class="flex justify-center items-center space-x-4 opacity-40">
+            <div class="h-px w-12 bg-slate-400"></div>
+            <span class="text-[10px] font-bold uppercase tracking-widest">Document Ref: RMS-1912-ML</span>
+            <div class="h-px w-12 bg-slate-400"></div>
+        </div>
+
+    </div>
 </div>
 
 </body>
